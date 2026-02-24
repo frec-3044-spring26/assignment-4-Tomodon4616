@@ -213,6 +213,8 @@ How comfortable are you proceeding with using this linear model for additional a
 
 **Answer 9:**
 
+Even though the p-value is significant, the R2 value of .2 shows that there are other factos that need to be considered in order to have a more complete picture of the change in ice off day of the lake. Therefore I would not be too confortable using this model unless more data was provided.
+
 **Question 10:**
 Now plot the data for Lake Sunapee (just like above - year on x-axis vs. ice of doy on y axis) but add the line from your regression results (e.g., fit intercept and slope). You will use the [`geom_abline`](https://ggplot2.tidyverse.org/reference/geom_abline.html). 
 
