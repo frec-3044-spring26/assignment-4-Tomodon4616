@@ -158,7 +158,9 @@ Use the [`add_predictions()`](https://modelr.tidyverse.org/reference/add_predict
 **Answer 5:**
 
 ```{r}
-
+library(modelr) 
+sunapee <- sunapee |> add_predictions(fit, var = "pred", type = NULL) |>
+  add_residuals(fit, var = "resid")
 ```
 
 Now, to visualize the residuals, use `geom_histogram()` to plot them as a histogram. I recommend using a bin width of 10 in the histogram.
@@ -171,8 +173,14 @@ Show Histogram and answer the following question: do the residuals meet the assu
 
 ```{r}
 
+ggplot(data = sunapee) +
+  geom_histogram(aes(x = resid), bins = 20) +
+  labs(title = "residual histogram",
+       x = "Residuals", 
+       y = "Count") +
+  theme_bw()
 ```
-
+looking at the histogram, the residuals are not normally distributed due to the slight left skew in the data.
 
 ## The slope is different from zero
 
@@ -183,6 +191,7 @@ A slope could appear to be higher or lower than zero, but the uncertainty in the
 Based on the `summary()` above, what is the p-value for the slope?
 
 **Answer 7:**
+The p-value is 2^-16
 
 ## The slope physically meaningful
 
@@ -193,6 +202,8 @@ A slope value could have a low probability of being 0 (thus we have a strong bel
 Based on the slope value, how many more years are needed to pass before the lake has a 1 week change in ice off doy? Do you think this is meaningful? Why?
 
 **Answer 8:**
+
+about 66 years. I would say that in order for this result to be meaningful, we would have to consider a longer-term view. While ice off day changing by one week in 66 years might not be that meaninful, applying that logic to a longer term of 200 years could show more significant results. 
 
 ## Overall model assessment
 
