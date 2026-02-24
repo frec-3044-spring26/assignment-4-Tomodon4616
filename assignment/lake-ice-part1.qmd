@@ -43,6 +43,7 @@ There should be four columns and \~2703 rows.
 We will practice key skills in the module using a focal lake. Use the `filter` function to filter the more extensive data to only contain the data from Lake Sunapee, a lake in New Hampshire. Filter the data `ice_data` by the variable `lake_name` to create a data frame called `sunapee`.
 
 ```{r}
+library(tidyverse)
 sunapee <- ice_data |> filter(lake_name == 'Sunapee')
 sunapee$ice_off_doy <- as.numeric(sunapee$ice_off_doy)
 sunapee
@@ -79,7 +80,7 @@ What do you expect the sign (plus, minus, or no change) to be for the slope of t
 
 **Answer 2:**
 
-I expect the sign to be negative as the general trend of the data is going downward.
+I expect the sign to be negative as the general trend of the data appears to be going downward.
 
 Use the `lm` function to predict `ice_off_doy` as a function (`~`) of the year for the data.frame called `sunapee`. You can learn more about the `lm` function [here](https://www.datacamp.com/tutorial/linear-regression-R)
 
@@ -176,7 +177,7 @@ Show Histogram and answer the following question: do the residuals meet the assu
 ggplot(data = sunapee) +
   geom_histogram(aes(x = resid), bins = 20) +
   labs(title = "residual histogram",
-       x = "Residuals", 
+       x = "Residual", 
        y = "Count") +
   theme_bw()
 ```
@@ -220,7 +221,11 @@ Now plot the data for Lake Sunapee (just like above - year on x-axis vs. ice of 
 
 **Answer 10:**
 ```{r}
-
+ggplot(sunapee, aes(x = year, y = ice_off_doy)) +
+  geom_point() +
+  geom_abline(slope = fit$coefficients[2], intercept = fit$coefficients[1]) +
+  labs(title = "Model fit of year vs Ice off Day") +
+  theme_bw()
 ```
 
 **Question 11:**
@@ -235,8 +240,17 @@ The goal of this question is to make a forecast of the future ice-off day (with 
 **Answer 11:**
 
 ```{r}
-
+ice_off_2040 <- fit$coefficients[2] * 2040 + fit$coefficients[1]
+quantiles <- quantile(sunapee$resid, probs = seq(0, 1, .05))
+lower <- ice_off_2040 + quantiles["5%"]
+upper <- ice_off_2040 + quantiles["95%"]
+as.numeric(lower)
+as.numeric(upper)
+width = as.numeric(upper - lower)
+width
 ```
+
+the confidence interval is about 34 days wide. Going back to the previous question about using this model to predict when ice off day will change by a week, we can see that this confidence interval basically invalidates any significant guessing power this model has in the short term.
 
 # Is the ice-off day of the year changing more quickly in more recent years at Lake Sunapee?
 
@@ -247,6 +261,27 @@ To answer this question, you need to divide the Sunapee dataset into two dataset
 Use the skills developed above to evaluate the question "Is the ice-off day of year changing more quickly in more recent years at Lake Sunapee?"
 
 **Answer 12:**
+
+```{r}
+sunapee1 <- sunapee |> filter(year < 1970) |> mutate(period = 'b')
+sunapee2 <- sunapee |> filter(year >= 1970) |> mutate(period = 'a')
+comb <- bind_rows(sunapee1, sunapee2)
+
+fit1 = lm(ice_off_doy ~ year, data = sunapee1)
+fit2 = lm(ice_off_doy ~ year, data = sunapee2)
+summary(fit1)
+summary(fit2)
+
+ggplot(comb, aes(x = year, y = ice_off_doy, color = period)) +
+  geom_point() +
+  geom_abline(slope = fit1$coefficients[2], intercept = fit1$coefficients[1], color = "blue") +
+  geom_abline(slope = fit2$coefficients[2], intercept = fit2$coefficients[1], color = "red") +
+  labs(title = "Comparison of Ice off Days before and after 1970", x = "year", y = "Ice off Day ") +
+  theme_bw()
+fit1$coefficients[2]
+fit2$coefficients[2]
+```
+Looking at the plot and the summary of the models, we can see that in recent years, the change in ice_off_day is changing at 3 times the rate as it was in the pastt. The R2 value for recent years is also double that of the earlier years, indicating that the year to ice_off_day trend is more definitive in recent years.
 
 Use a mix of code, figures, and text to present your analysis.  If you want to compare slopes, be sure they are on the same plot.
 
