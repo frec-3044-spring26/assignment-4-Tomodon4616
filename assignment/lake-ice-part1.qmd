@@ -122,6 +122,11 @@ First, it is important to understand how much variation is explained by the mode
 What is the R2 for the regression? Based on the R2, is `year` and `ice_off_doy` strongly related?
 
 **Answer 4:**
+```{r}
+summary(fit)
+```
+
+The R2 value is 20%, so we can say that they are not strongly related.
 
 ## Residuals normally distributed
 
